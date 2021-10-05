@@ -1,5 +1,6 @@
 %{
     #include "syntax.tab.h"
+    #include "TreeNode.hpp"
 
     #define EXIT_OK 0
     #define EXIT_FAIL 1
@@ -21,12 +22,12 @@ digit [0-9]
 hexdigit [0-9a-fA-F]
 
 %%
-(\+?|-)0x{hexdigit}+|(\+?|-){digit}+    { yylval = make_int_node("INT", yylloc, yytext); return INT; }
-{digit}+\.{digit}+                      { yylval = make_float_node("FLOAT", yylloc, yytext); return FLOAT; }
-\'([\x20-\x7E]|\\x{hexdigit}{1,2})\'    { yylval = make_char_node("CHAR", yylloc, yytext); return CHAR; }
-{letter_}({letter_}|{digit})*           { yylval = make_id_node("INT", yylloc, yytext); return ID; }
+(\+?|-)0x{hexdigit}+|(\+?|-){digit}+    { yylval = create_node("INT", yylloc, DataType::INT, yytext); return INT; }
+{digit}+\.{digit}+                      { yylval = create_node("FLOAT", yylloc, DataType::FLOAT, yytext); return FLOAT; }
+\'([\x20-\x7E]|\\x{hexdigit}{1,2})\'    { yylval = create_node("CHAR", yylloc, DataType::CHAR, yytext); return CHAR; }
+{letter_}({letter_}|{digit})*           { yylval = create_node("ID", yylloc, DataType::ID, yytext); return ID; }
 
-int|float|char  { return TYPE; }
+int|float|char  { yylval = create_node("TYPE", yylloc, DataType::TYPE, yytext); return TYPE; }
 struct          { return STRUCT; }
 if              { return IF; }
 else            { return ELSE; }

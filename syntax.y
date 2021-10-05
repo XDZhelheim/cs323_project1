@@ -1,5 +1,6 @@
 %{
     #include "lex.yy.c"
+    #define YYSTYPE TreeNode*
     extern "C" {
         #include "TreeNode.hpp"
     }
