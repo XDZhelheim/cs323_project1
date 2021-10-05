@@ -4,7 +4,17 @@
         #include "TreeNode.hpp"
     }
     void yyerror(const char*);
+    struct TreeNode *root;
 %}
+%define api.value.type {struct TreeNode *}
+
+%initial-action
+{
+  @$.first_line = 1;
+  @$.first_column = 1;
+  @$.last_line = 1;
+  @$.last_column = 1;
+};
 
 %token INT FLOAT CHAR ID
 %token TYPE

@@ -3,6 +3,7 @@
 #include <vector>
 #include <initializer_list>
 #include <string>
+#include "YYLTYPE.h"
 
 using std::vector;
 using std::initializer_list;
@@ -14,46 +15,51 @@ enum DataType {
     INT, FLOAT, CHAR, OP, CHILD
 };
 
-TreeNode *make_op_node(string name)
+TreeNode *make_op_node(string name, struct YYLTYPE position)
 {
     TreeNode *node = new TreeNode;
     node->name = name;
     node->type = DataType::OP;
+    node->pos = position;
     return node;
 }
 
-TreeNode *make_int_node(string name, string val)
+TreeNode *make_int_node(string name, struct YYLTYPE position, string val)
 {
     TreeNode *node = new TreeNode;
     node->name = name;
     node->type = DataType::INT;
+    node->pos = position;
     node->data = val;
     return node;
 }
 
-TreeNode *make_float_node(string name, string val)
+TreeNode *make_float_node(string name, struct YYLTYPE position, string val)
 {
     TreeNode *node = new TreeNode;
     node->name = name;
     node->type = DataType::FLOAT;
+    node->pos = position;
     node->data = val;
     return node;
 }
 
-TreeNode *make_char_node(string name, string val)
+TreeNode *make_char_node(string name, struct YYLTYPE position, string val)
 {
     TreeNode *node = new TreeNode;
     node->name = name;
     node->type = DataType::CHAR;
+    node->pos = position;
     node->data = val;
     return node;
 }
 
-TreeNode *make_child_node(string name, initializer_list<TreeNode *> child)
+TreeNode *make_child_node(string name, struct YYLTYPE position, initializer_list<TreeNode *> child)
 {
     TreeNode *node = new TreeNode;
     node->name = name;
     node->type = DataType::CHILD;
+    node->pos = position;
     for (auto c : child) {
         c->parent = node;
         node->child.push_back(c);
@@ -65,6 +71,7 @@ struct TreeNode
 {
     string name;
     DataType type;
+    YYLTYPE pos;
     TreeNode *parent;
     string data;
     vector<TreeNode *> child;
