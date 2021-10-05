@@ -1,5 +1,8 @@
 %{
-    #include"lex.yy.c"
+    #include "lex.yy.c"
+    extern "C" {
+        #include "TreeNode.hpp"
+    }
     void yyerror(const char*);
 %}
 
@@ -15,6 +18,16 @@
 %token PLUS MINUS MUL DIV
 %token AND OR NOT
 %token LP RP LB RB LC RC
+
+%right ASSIGN
+%left OR
+%left AND
+%left GT GE LT LE EQ NE
+%left PLUS MINUS
+%left MUL DIV
+%right NOT
+%left LC RC LB RB DOT
+
 %%
 Program: ExtDefList;
 ExtDefList: ExtDef ExtDefList
