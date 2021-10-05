@@ -77,6 +77,10 @@ public:
 
     void recursive_print(TreeNode *node, int depth)
     {
+        if (node->type == DataType::CHILD && node->child.size() == 0) 
+        {
+            return;
+        }
         for (int i = 0; i < depth; i++)
         {
             out << "  ";
@@ -122,7 +126,7 @@ void PrintTreeNode(TreeNode *root, char *file_path)
     string out_path = "/dev/stdout";
     if (path.substr(path.length() - 4) == ".spl")
     {
-        out_path = path.substr(path.length() - 4) + ".out";
+        out_path = path.substr(0, path.length() - 4) + ".out";
     }
     Printer(root, out_path).print();
 }

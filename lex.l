@@ -27,7 +27,6 @@ hexdigit [0-9a-fA-F]
 (\+?|-)0x{hexdigit}+|(\+?|-){digit}+    { yylval = create_node("INT", 0, DataType::INT_TYPE, yytext); return INT; }
 {digit}+\.{digit}+                      { yylval = create_node("FLOAT", 0, DataType::FLOAT_TYPE, yytext); return FLOAT; }
 \'([\x20-\x7E]|\\x{hexdigit}{1,2})\'    { yylval = create_node("CHAR", 0, DataType::CHAR_TYPE, yytext); return CHAR; }
-{letter_}({letter_}|{digit})*           { yylval = create_node("ID", 0, DataType::ID_TYPE, yytext); return ID; }
 
 int|float|char  { yylval = create_node("TYPE", 0, DataType::TYPE_TYPE, yytext); return TYPE; }
 struct          { yylval = create_node("STRUCT", 0); return STRUCT; }
@@ -35,6 +34,8 @@ if              { yylval = create_node("IF", 0); return IF; }
 else            { yylval = create_node("ELSE", 0); return ELSE; }
 while           { yylval = create_node("WHILE", 0); return WHILE; }
 return          { yylval = create_node("RETURN", 0); return RETURN; }
+
+{letter_}({letter_}|{digit})*           { yylval = create_node("ID", 0, DataType::ID_TYPE, yytext); return ID; }
 
 "."     { yylval = create_node("DOT", 0); return DOT; }
 ";"     { yylval = create_node("SEMI", 0); return SEMI; }
