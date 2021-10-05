@@ -50,3 +50,15 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# syntax
+syntax.tab.c
+syntax.tab.h
+syntax.output
+
+# flex
+lex.yy.c
+
+# bin
+
+/bin/

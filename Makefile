@@ -1,8 +1,15 @@
 CC=gcc
-splc:
-	@mkdir bin
-	touch bin/splc
-	@chmod +x bin/splc
+CXX=g++
+FLEX=flex
+BISON=bison
+
+
+.lex: lex.l
+	$(FLEX) lex.l
+.syntax: syntax.y
+	$(BISON) -v -t -d syntax.y
+splc: .lex .syntax
+	mkdir -p bin && $(CXX) syntax.tab.c -lfl -ly -o bin/splc
 clean:
-	@rm -rf bin/
-.PHONY: splc
+	@rm -f lex.yy.c syntax.tab.* *.out *.so
+all: splc
