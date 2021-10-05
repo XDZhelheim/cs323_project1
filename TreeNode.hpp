@@ -95,7 +95,7 @@ public:
         }
         else if (node->type == DataType::INT_TYPE)
         {
-            out << "INT: " << node->data << endl;
+            out << "INT: " << strtol(node->data.c_str(), NULL, 0) << endl;
         }
         else if (node->type == DataType::FLOAT_TYPE)
         {
