@@ -6,19 +6,26 @@
 #include <fstream>
 #include "YYLTYPE.h"
 
-using std::vector;
-using std::initializer_list;
-using std::string;
-using std::ofstream;
 using std::endl;
+using std::initializer_list;
+using std::ofstream;
+using std::string;
+using std::vector;
 
 struct TreeNode;
 
-enum DataType {
-    INT, FLOAT, CHAR, ID, TYPE, CHILD, OTHER
+enum DataType
+{
+    INT,
+    FLOAT,
+    CHAR,
+    ID,
+    TYPE,
+    CHILD,
+    OTHER
 };
 
-TreeNode *create_node(string name, struct YYLTYPE position, DataType type, string val="")
+TreeNode *create_node(string name, struct YYLTYPE position, DataType type, string val = "")
 {
     TreeNode *node = new TreeNode;
     node->name = name;
@@ -34,7 +41,8 @@ TreeNode *create_child_node(string name, struct YYLTYPE position, initializer_li
     node->name = name;
     node->type = DataType::CHILD;
     node->pos = position;
-    for (auto c : child) {
+    for (auto c : child)
+    {
         c->parent = node;
         node->child.push_back(c);
     }
@@ -64,7 +72,7 @@ public:
         out = ofstream(path);
     }
 
-    void print() 
+    void print()
     {
         recursive_print(root, 0);
     }
@@ -78,11 +86,35 @@ public:
         if (node->type == DataType::TYPE)
         {
             out << "TYPE: " << node->data << endl;
-        } else if (node->type == DataType::CHAR)
+        }
+        else if (node->type == DataType::CHAR)
         {
             out << "CHAR: " << node->data << endl;
         }
-        
+        else if (node->type == DataType::INT)
+        {
+            out << "INT: " << node->data << endl;
+        }
+        else if (node->type == DataType::FLOAT)
+        {
+            out << "FLOAT: " << node->data << endl;
+        }
+        else if (node->type == DataType::ID)
+        {
+            out << "ID: " << node->data << endl;
+        }
+        else if (node->type == DataType::OTHER)
+        {
+            out << node->name << endl;
+        }
+        else
+        {
+            out << node->name << " (" << node->pos.first_line << ")" << endl;
+            for (auto c : node->child)
+            {
+                recursive_print(c, depth + 1);
+            }
+        }
     }
 };
 
