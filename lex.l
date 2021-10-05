@@ -28,35 +28,35 @@ hexdigit [0-9a-fA-F]
 {letter_}({letter_}|{digit})*           { yylval = create_node("ID", yylloc, DataType::ID, yytext); return ID; }
 
 int|float|char  { yylval = create_node("TYPE", yylloc, DataType::TYPE, yytext); return TYPE; }
-struct          { return STRUCT; }
-if              { return IF; }
-else            { return ELSE; }
-while           { return WHILE; }
-return          { return RETURN; }
+struct          { yylval = create_node("STRUCT", yylloc; return STRUCT; }
+if              { yylval = create_node("IF", yylloc; return IF; }
+else            { yylval = create_node("ELSE", yylloc); return ELSE; }
+while           { yylval = create_node("WHILE", yylloc); return WHILE; }
+return          { yylval = create_node("RETURN", yylloc); return RETURN; }
 
-"."     { return DOT; }
-";"     { return SEMI; }
-","     { return COMMA; }
-"="     { return ASSIGN; }
-"<"     { return LT; }
-"<="    { return LE; }
-">"     { return GT; }
-">="    { return GE; }
-"!="    { return NE; }
-"=="    { return EQ; }
-"+"     { return PLUS; }
-"-"     { return MINUS; }
-"*"     { return MUL; }
-"/"     { return DIV; }
-"&&"    { return AND; }
-"||"    { return OR; }
-"!"     { return NOT; }
-"("     { return LP; }
-")"     { return RP; }
-"["     { return LB; }
-"]"     { return RB; }
-"{"     { return LC; }
-"}"     { return RC; }
+"."     { yylval = create_node("DOT", yylloc); return DOT; }
+";"     { yylval = create_node("SEMI", yylloc); return SEMI; }
+","     { yylval = create_node("COMMA", yylloc); return COMMA; }
+"="     { yylval = create_node("ASSIGN", yylloc); return ASSIGN; }
+"<"     { yylval = create_node("LT", yylloc); return LT; }
+"<="    { yylval = create_node("LE", yylloc); return LE; }
+">"     { yylval = create_node("GT", yylloc); return GT; }
+">="    { yylval = create_node("GE", yylloc); return GE; }
+"!="    { yylval = create_node("NE", yylloc); return NE; }
+"=="    { yylval = create_node("EQ", yylloc); return EQ; }
+"+"     { yylval = create_node("PLUS", yylloc); return PLUS; }
+"-"     { yylval = create_node("MINUS", yylloc); return MINUS; }
+"*"     { yylval = create_node("MUL", yylloc); return MUL; }
+"/"     { yylval = create_node("DIV", yylloc); return DIV; }
+"&&"    { yylval = create_node("AND", yylloc); return AND; }
+"||"    { yylval = create_node("OR", yylloc); return OR; }
+"!"     { yylval = create_node("NOT", yylloc); return NOT; }
+"("     { yylval = create_node("LP", yylloc); return LP; }
+")"     { yylval = create_node("RP", yylloc); return RP; }
+"["     { yylval = create_node("LB", yylloc); return LB; }
+"]"     { yylval = create_node("RB", yylloc); return RB; }
+"{"     { yylval = create_node("LC", yylloc); return LC; }
+"}"     { yylval = create_node("RC", yylloc); return RC; }
 
 "//" {
     char c = yyinput();

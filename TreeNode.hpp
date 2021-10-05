@@ -25,7 +25,7 @@ enum DataType
     OTHER
 };
 
-TreeNode *create_node(string name, struct YYLTYPE position, DataType type, string val = "")
+TreeNode *create_node(string name, struct YYLTYPE position, DataType type=DataType::OTHER, string val = "")
 {
     TreeNode *node = new TreeNode;
     node->name = name;
