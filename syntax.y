@@ -1,13 +1,12 @@
 %{
     #include "lex.yy.c"
-    #define YYSTYPE TreeNode*
+    #define YYSTYPE TreeNode *
     extern "C" {
         #include "TreeNode.hpp"
     }
     void yyerror(const char*);
     struct TreeNode *root;
 %}
-%define api.value.type {struct TreeNode *}
 
 %initial-action
 {
@@ -40,77 +39,131 @@
 %left LC RC LB RB DOT
 
 %%
-Program: ExtDefList;
-ExtDefList: ExtDef ExtDefList
-    | %empty;
-ExtDef: Specifier ExtDecList SEMI
-    | Specifier SEMI
-    | Specifier FunDec CompSt;
-ExtDecList: VarDec
-    | VarDec COMMA ExtDecList;
+Program: 
+      ExtDefList                            { $$ = create_child_node("Program", @$, {$1}); root = $$; }
+    ;
+ExtDefList: 
+      ExtDef ExtDefList                     { $$ = create_child_node("ExtDefList", @$, {$1, $2}); }
+    | %empty                                { $$ = create_child_node("ExtDefList", @$, {}); }
+    ;   
+ExtDef: 
+      Specifier ExtDecList SEMI             { $$ = create_child_node("ExtDef", @$, {$1, $2, $3}); }
+    | Specifier SEMI                        { $$ = create_child_node("ExtDef", @$, {$1, $2}); }
+    | Specifier FunDec CompSt               { $$ = create_child_node("ExtDef", @$, {$1, $2, $3}); }
+    ;
+ExtDecList: 
+      VarDec                                { $$ = create_child_node("ExtDecList", @$, {$1}); }
+    | VarDec COMMA ExtDecList               { $$ = create_child_node("ExtDecList", @$, {$1, $2, $3}); }
+    ;
 
-Specifier: TYPE
-    | StructSpecifier;
-StructSpecifier: STRUCT ID LC DefList RC
-    | STRUCT ID;
+Specifier: 
+      TYPE                                  { $$ = create_child_node("Specifier", @$, {$1}); }
+    | StructSpecifier                       { $$ = create_child_node("Specifier", @$, {$1}); }
+    ;
+StructSpecifier: 
+      STRUCT ID LC DefList RC               { $$ = create_child_node("StructSpecifier", @$, {$1, $2, $3, $4, $5}); }
+    | STRUCT ID                             { $$ = create_child_node("StructSpecifier", @$, {$1, $2}); }
+    ;
 
-VarDec: ID
-    | VarDec LB INT RB;
-FunDec: ID LP VarList RP
-    | ID LP RP;
-VarList: ParamDec COMMA VarList
-    | ParamDec;
-ParamDec: Specifier VarDec;
+VarDec:
+      ID                                    { $$ = create_child_node("VarDec", @$, {$1}); }
+    | VarDec LB INT RB                      { $$ = create_child_node("VarDec", @$, {$1, $2, $3, $4}); }
+    ;
+FunDec: 
+      ID LP VarList RP                      { $$ = create_child_node("FunDec", @$, {$1, $2, $3, $4}); }
+    | ID LP RP                              { $$ = create_child_node("FunDec", @$, {$1, $2, $3}); }
+    ;
+VarList: 
+      ParamDec COMMA VarList                { $$ = create_child_node("VarList", @$, {$1, $2, $3}); }
+    | ParamDec                              { $$ = create_child_node("VarList", @$, {$1}); }
+    ;
+ParamDec: 
+      Specifier VarDec                      { $$ = create_child_node("ParamDec", @$, {$1, $2}); }
+    ;
 
-CompSt: LC DefList StmtList RC;
-StmtList: Stmt StmtList
-    | %empty;
-Stmt: Exp SEMI
-    | CompSt
-    | RETURN Exp SEMI
-    | IF LP Exp RP Stmt
-    | IF LP Exp RP Stmt ELSE Stmt
-    | WHILE LP Exp RP Stmt;
+CompSt: 
+      LC DefList StmtList RC                { $$ = create_child_node("CompSt", @$, {$1, $2, $3, $4}); }
+    ;
+StmtList: 
+      Stmt StmtList                         { $$ = create_child_node("StmtList", @$, {$1, $2}); }
+    | %empty                                { $$ = create_child_node("StmtList", @$, {}); }
+    ;
+Stmt: 
+      Exp SEMI                              { $$ = create_child_node("Stmt", @$, {$1, $2}); }
+    | CompSt                                { $$ = create_child_node("Stmt", @$, {$1}); }
+    | RETURN Exp SEMI                       { $$ = create_child_node("Stmt", @$, {$1, $2, $3}); }
+    | IF LP Exp RP Stmt                     { $$ = create_child_node("Stmt", @$, {$1, $2, $3, $4, $5}); }
+    | IF LP Exp RP Stmt ELSE Stmt           { $$ = create_child_node("Stmt", @$, {$1, $2, $3, $4, $5, $6, $7}); }
+    | WHILE LP Exp RP Stmt                  { $$ = create_child_node("Stmt", @$, {$1, $2, $3, $4, $5}); }
+    ;
+DefList: 
+      Def DefList                           { $$ = create_child_node("DefList", @$, {$1, $2}); }
+    | %empty                                { $$ = create_child_node("DefList", @$, {}); }
+    ;
+Def: 
+      Specifier DecList SEMI                { $$ = create_child_node("Def", @$, {$1, $2, $3}); }
+    ;
+DecList: 
+      Dec                                   { $$ = create_child_node("DecList", @$, {$1}); }
+    | Dec COMMA DecList                     { $$ = create_child_node("DecList", @$, {$1, $2, $3}); }
+    ;
+Dec: 
+      VarDec                                { $$ = create_child_node("Dec", @$, {$1}); }
+    | VarDec ASSIGN Exp                     { $$ = create_child_node("Dec", @$, {$1, $2, $3}); }
+    ;
 
-DefList: Def DefList
-    | %empty;
-Def: Specifier DecList SEMI;
-DecList: Dec
-    | Dec COMMA DecList;
-Dec: VarDec
-    | VarDec ASSIGN Exp;
-
-Exp: Exp ASSIGN Exp
-    | Exp AND Exp
-    | Exp OR Exp
-    | Exp LT Exp
-    | Exp LE Exp
-    | Exp GT Exp
-    | Exp GE Exp
-    | Exp NE Exp
-    | Exp EQ Exp
-    | Exp PLUS Exp
-    | Exp MINUS Exp
-    | Exp MUL Exp
-    | Exp DIV Exp
-    | LP Exp RP
-    | MINUS Exp
-    | NOT Exp
-    | ID LP Args RP
-    | ID LP RP
-    | Exp LB Exp RB
-    | Exp DOT ID
-    | ID
-    | INT
-    | FLOAT
-    | CHAR;
-Args: Exp COMMA Args
-    | Exp;
+Exp: 
+      Exp ASSIGN Exp                        { $$ = create_child_node("Exp", @$, {$1, $2, $3}); }
+    | Exp AND Exp                           { $$ = create_child_node("Exp", @$, {$1, $2, $3}); }
+    | Exp OR Exp                            { $$ = create_child_node("Exp", @$, {$1, $2, $3}); }
+    | Exp LT Exp                            { $$ = create_child_node("Exp", @$, {$1, $2, $3}); }
+    | Exp LE Exp                            { $$ = create_child_node("Exp", @$, {$1, $2, $3}); }
+    | Exp GT Exp                            { $$ = create_child_node("Exp", @$, {$1, $2, $3}); }
+    | Exp GE Exp                            { $$ = create_child_node("Exp", @$, {$1, $2, $3}); }
+    | Exp NE Exp                            { $$ = create_child_node("Exp", @$, {$1, $2, $3}); }
+    | Exp EQ Exp                            { $$ = create_child_node("Exp", @$, {$1, $2, $3}); }
+    | Exp PLUS Exp                          { $$ = create_child_node("Exp", @$, {$1, $2, $3}); }
+    | Exp MINUS Exp                         { $$ = create_child_node("Exp", @$, {$1, $2, $3}); }
+    | Exp MUL Exp                           { $$ = create_child_node("Exp", @$, {$1, $2, $3}); }
+    | Exp DIV Exp                           { $$ = create_child_node("Exp", @$, {$1, $2, $3}); }
+    | LP Exp RP                             { $$ = create_child_node("Exp", @$, {$1, $2, $3}); }
+    | MINUS Exp                             { $$ = create_child_node("Exp", @$, {$1, $2}); }
+    | NOT Exp                               { $$ = create_child_node("Exp", @$, {$1, $2}); }
+    | ID LP Args RP                         { $$ = create_child_node("Exp", @$, {$1, $2, $3, $4}); }
+    | ID LP RP                              { $$ = create_child_node("Exp", @$, {$1, $2, $3}); }
+    | Exp LB Exp RB                         { $$ = create_child_node("Exp", @$, {$1, $2, $3, $4}); }
+    | Exp DOT ID                            { $$ = create_child_node("Exp", @$, {$1, $2, $3}); }
+    | ID                                    { $$ = create_child_node("Exp", @$, {$1}); }
+    | INT                                   { $$ = create_child_node("Exp", @$, {$1}); }
+    | FLOAT                                 { $$ = create_child_node("Exp", @$, {$1}); }
+    | CHAR                                  { $$ = create_child_node("Exp", @$, {$1}); }
+    ;
+Args: 
+      Exp COMMA Args                        { $$ = create_child_node("Args", @$, {$1, $2, $3}); }
+    | Exp                                   { $$ = create_child_node("Args", @$, {$1}); }
+    ;
 
 %%
 void yyerror(const char *s) {
     fprintf(stderr, "%s\n", s);
 }
-int main() {
-    yyparse();
+
+int main(int argc, char **argv){
+    char *file_path;
+    if(argc < 2){
+        fprintf(stderr, "Usage: %s <file_path>\n", argv[0]);
+        return EXIT_FAIL;
+    } else if(argc == 2){
+        file_path = argv[1];
+        if(!(yyin = fopen(file_path, "r"))){
+            perror(argv[1]);
+            return EXIT_FAIL;
+        }
+        yyparse();
+        PrintTreeNode(root, file_path);
+        return EXIT_OK;
+    } else{
+        fputs("Too many arguments! Expected: 2.\n", stderr);
+        return EXIT_FAIL;
+    }
 }
