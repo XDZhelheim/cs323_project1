@@ -12,7 +12,7 @@ using std::string;
 struct TreeNode;
 
 enum DataType {
-    INT, FLOAT, CHAR, OP, CHILD
+    INT, FLOAT, CHAR, OP, ID, TYPE, CHILD
 };
 
 TreeNode *make_op_node(string name, struct YYLTYPE position)
@@ -49,6 +49,26 @@ TreeNode *make_char_node(string name, struct YYLTYPE position, string val)
     TreeNode *node = new TreeNode;
     node->name = name;
     node->type = DataType::CHAR;
+    node->pos = position;
+    node->data = val;
+    return node;
+}
+
+TreeNode *make_id_node(string name, struct YYLTYPE position, string val)
+{
+    TreeNode *node = new TreeNode;
+    node->name = name;
+    node->type = DataType::ID;
+    node->pos = position;
+    node->data = val;
+    return node;
+}
+
+TreeNode *make_type_node(string name, struct YYLTYPE position, string val)
+{
+    TreeNode *node = new TreeNode;
+    node->name = name;
+    node->type = DataType::TYPE;
     node->pos = position;
     node->data = val;
     return node;

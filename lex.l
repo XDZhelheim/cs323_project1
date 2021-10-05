@@ -1,20 +1,19 @@
 %{
+    #include "syntax.tab.h"
+
     #define EXIT_OK 0
     #define EXIT_FAIL 1
 
+    int yycolno = 1;
     #define YY_USER_ACTION \
-        yylloc.first_line = yylloc.last_line; \
-        yylloc.first_column = yylloc.last_column; \
-        for (int i = 0; yytext[i] != '\0'; i++) { \
-            if(yytext[i] == '\n') { \
-                yylloc.last_line++; \
-                yylloc.last_column = 1; \
-            } \
-            else { \
-                yylloc.last_column++; \
-            } \
-        }
+        yylloc.first_line = yylineno; \
+        yylloc.first_column = yycolno; \
+        yylloc.last_line = yylineno; \
+        yylloc.last_column = yycolno + yyleng; \
+        yycolno += yyleng;
 %}
+
+%option yylineno
 
 letter [a-zA-Z]
 letter_ {letter}|_
@@ -22,10 +21,10 @@ digit [0-9]
 hexdigit [0-9a-fA-F]
 
 %%
-(\+?|-)0x{hexdigit}+|(\+?|-){digit}+    { return INT; }
-{digit}+\.{digit}+                      { return FLOAT; }
-\'([\x20-\x7E]|\\x{hexdigit}{1,2})\'    { return CHAR; }
-{letter_}({letter_}|{digit})*           { return ID; }
+(\+?|-)0x{hexdigit}+|(\+?|-){digit}+    { yylval = make_int_node("INT", yylloc, yytext); return INT; }
+{digit}+\.{digit}+                      { yylval = make_float_node("FLOAT", yylloc, yytext); return FLOAT; }
+\'([\x20-\x7E]|\\x{hexdigit}{1,2})\'    { yylval = make_char_node("CHAR", yylloc, yytext); return CHAR; }
+{letter_}({letter_}|{digit})*           { yylval = make_id_node("INT", yylloc, yytext); return ID; }
 
 int|float|char  { return TYPE; }
 struct          { return STRUCT; }
@@ -58,7 +57,15 @@ return          { return RETURN; }
 "{"     { return LC; }
 "}"     { return RC; }
 
-[ \n\r\t] {}
+"//" {
+    char c = yyinput();
+    while(c != '\n') {
+        c = yyinput();
+    }
+}
+
+"\n" { yycolumn = 1; }
+[ \r\t] {}
 
 . { fprintf(stderr, "Mysterious lexeme: %s\n", yytext); }
 
