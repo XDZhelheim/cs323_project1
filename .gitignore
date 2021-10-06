@@ -30,7 +30,6 @@
 
 # Executables
 *.exe
-*.out
 *.app
 *.i*86
 *.x86_64
@@ -60,6 +59,9 @@ syntax.output
 lex.yy.c
 
 # bin
-
 /bin/
+
 .vscode/
+
+# test result
+/test/*.out
