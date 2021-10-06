@@ -111,7 +111,7 @@ DefList:
 Def: 
       Specifier DecList SEMI                { $$ = create_child_node("Def", @$.first_line, {$1, $2, $3}); }
     | Specifier DecList error               { fprintf(output_file, "Error type B at Line %d: Missing semicolon ';'\n", @$.first_line); error_happen = 1; }
-    | error DecList SEMI                    { fprintf(output_file, "error DecList SEMI Error type B at Line %d: Missing specifier\n", @$.first_line); error_happen = 1; }
+    | error DecList SEMI                    { fprintf(output_file, "Error type B at Line %d: Missing specifier\n", @$.first_line); error_happen = 1; }
     ;
 DecList: 
       Dec                                   { $$ = create_child_node("DecList", @$.first_line, {$1}); }
