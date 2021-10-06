@@ -7,7 +7,7 @@
 #include <fstream>
 #include <unistd.h>
 
-FILE *tmp_file;
+FILE *output_file;
 int error_happen;
 
 using std::endl;
@@ -134,30 +134,7 @@ void PrintTreeNode(char *file_path)
     {
         out_path = path.substr(0, path.length() - 4) + ".out";
     }
-    if (error_happen)
-    {
-        fflush(tmp_file);
-        fseek(tmp_file, 0, SEEK_SET);
-
-        const size_t buffer_size = 1023;
-        char buffer[buffer_size + 1];
-
-        size_t size = buffer_size;
-        FILE *out = fopen(out_path.c_str(), "w+");
-        while (size == buffer_size)
-        {
-            size = fread(buffer, 1, buffer_size, tmp_file);
-
-            fwrite(buffer, 1, size, out);
-        }
-        fflush(out);
-
-        fclose(tmp_file);
-    }
-    else
-    {
-        Printer(root, out_path).print();
-    }
+    Printer(root, out_path).print();
 }
 
 #endif

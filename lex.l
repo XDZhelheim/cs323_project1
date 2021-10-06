@@ -71,6 +71,6 @@ return          { yylval = create_node("RETURN", 0); return RETURN; }
 "\n" { yycolno = 1; }
 [ \r\t] {}
 
-. { fprintf(tmp_file, "Error type A at Line %d: unknown lexeme %s\n", yylineno, yytext); error_happen = 1; }
+. { fprintf(output_file, "Error type A at Line %d: unknown lexeme %s\n", yylineno, yytext); error_happen = 1; }
 
 %%

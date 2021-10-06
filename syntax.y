@@ -149,7 +149,6 @@ void yyerror(const char *s) {
 }
 
 int main(int argc, char **argv){
-    tmp_file = tmpfile();
     error_happen = 0;
 
     char *file_path;
@@ -162,16 +161,26 @@ int main(int argc, char **argv){
             perror(argv[1]);
             return EXIT_FAIL;
         }
-        yyparse();
-        char* out_path;
-        char* ext;
-        strncpy(ext, &file_path[strlen(file_path) - 4], 4);
-        if (strcmp(ext, ".spl") == 0)
+        int len = strlen(file_path);
+        if (strcmp(file_path+len-4, ".spl")==0)
         {
-            strncpy(out_path, file_path, strlen(file_path) - 4);
-            strcat(out_path, ".out");
+            char out[100];
+            strcpy(out, file_path);
+            out[len-3]='o';
+            out[len-2]='u';
+            out[len-1]='t';
+            output_file = fopen(out, "w+");
         }
-        PrintTreeNode(file_path);
+        yyparse();
+        if (error_happen) {
+            fflush(output_file);
+            fclose(output_file);
+        }
+        else
+        {
+            fclose(output_file);
+            PrintTreeNode(file_path);
+        }
         return 0;
     } else{
         fputs("Too many arguments! Expected: 2.\n", stderr);
