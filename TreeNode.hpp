@@ -39,7 +39,7 @@ struct TreeNode
 
 struct TreeNode *root;
 
-TreeNode *create_node(string name, int position, DataType type = DataType::OTHER, string val = "")
+TreeNode *create_node(string name, int position=0, DataType type = DataType::OTHER, string val = "")
 {
     TreeNode *node = new TreeNode;
     node->name = name;

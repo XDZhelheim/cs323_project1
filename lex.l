@@ -37,29 +37,70 @@ return          { yylval = create_node("RETURN", 0); return RETURN; }
 
 {letter_}({letter_}|{digit})*           { yylval = create_node("ID", 0, DataType::ID_TYPE, yytext); return ID; }
 
-"."     { yylval = create_node("DOT", 0); return DOT; }
-";"     { yylval = create_node("SEMI", 0); return SEMI; }
-","     { yylval = create_node("COMMA", 0); return COMMA; }
-"="     { yylval = create_node("ASSIGN", 0); return ASSIGN; }
-"<"     { yylval = create_node("LT", 0); return LT; }
-"<="    { yylval = create_node("LE", 0); return LE; }
-">"     { yylval = create_node("GT", 0); return GT; }
-">="    { yylval = create_node("GE", 0); return GE; }
-"!="    { yylval = create_node("NE", 0); return NE; }
-"=="    { yylval = create_node("EQ", 0); return EQ; }
-"+"     { yylval = create_node("PLUS", 0); return PLUS; }
-"-"     { yylval = create_node("MINUS", 0); return MINUS; }
-"*"     { yylval = create_node("MUL", 0); return MUL; }
-"/"     { yylval = create_node("DIV", 0); return DIV; }
-"&&"    { yylval = create_node("AND", 0); return AND; }
-"||"    { yylval = create_node("OR", 0); return OR; }
-"!"     { yylval = create_node("NOT", 0); return NOT; }
-"("     { yylval = create_node("LP", 0); return LP; }
-")"     { yylval = create_node("RP", 0); return RP; }
-"["     { yylval = create_node("LB", 0); return LB; }
-"]"     { yylval = create_node("RB", 0); return RB; }
-"{"     { yylval = create_node("LC", 0); return LC; }
-"}"     { yylval = create_node("RC", 0); return RC; }
+"."     { yylval = create_node("DOT"); return DOT; }
+";"     { yylval = create_node("SEMI"); return SEMI; }
+","     { yylval = create_node("COMMA"); return COMMA; }
+"="     { yylval = create_node("ASSIGN"); return ASSIGN; }
+"<"     { yylval = create_node("LT"); return LT; }
+"<="    { yylval = create_node("LE"); return LE; }
+">"     { yylval = create_node("GT"); return GT; }
+">="    { yylval = create_node("GE"); return GE; }
+"!="    { yylval = create_node("NE"); return NE; }
+"=="    { yylval = create_node("EQ"); return EQ; }
+"+"     { yylval = create_node("PLUS"); return PLUS; }
+"-"     { yylval = create_node("MINUS"); return MINUS; }
+"*"     { yylval = create_node("MUL"); return MUL; }
+"/"     { yylval = create_node("DIV"); return DIV; }
+"&&"    { yylval = create_node("AND"); return AND; }
+"||"    { yylval = create_node("OR"); return OR; }
+"!"     { yylval = create_node("NOT"); return NOT; }
+"("     { yylval = create_node("LP"); return LP; }
+")"     { yylval = create_node("RP"); return RP; }
+"["     { yylval = create_node("LB"); return LB; }
+"]"     { yylval = create_node("RB"); return RB; }
+"{"     { yylval = create_node("LC"); return LC; }
+"}"     { yylval = create_node("RC"); return RC; }
+
+"&" { 
+    fprintf(output_file, "Error type A at Line %d: unknown lexeme %s\n", yylineno, yytext); 
+    error_happen = 1; 
+    yylval = create_node("ERR"); 
+    return AND; 
+}
+"|" { 
+    fprintf(output_file, "Error type A at Line %d: unknown lexeme %s\n", yylineno, yytext); 
+    error_happen = 1; 
+    yylval = create_node("ERR"); 
+    return OR; 
+}
+
+0x{hexdigit}*[g-zG-Z]{hexdigit}* { 
+    fprintf(output_file, "Error type A at Line %d: unknown lexeme %s\n", yylineno, yytext); 
+    error_happen = 1; 
+    yylval = create_node("ERR"); 
+    return INT; 
+}
+
+\'\\x{hexdigit}*[g-zG-Z]{hexdigit}*\' { 
+    fprintf(output_file, "Error type A at Line %d: unknown lexeme %s\n", yylineno, yytext); 
+    error_happen = 1; 
+    yylval = create_node("ERR"); 
+    return CHAR; 
+}
+
+\'\\x{hexdigit}{3,}\' { 
+    fprintf(output_file, "Error type A at Line %d: unknown lexeme %s\n", yylineno, yytext); 
+    error_happen = 1; 
+    yylval = create_node("ERR"); 
+    return CHAR; 
+}
+
+[0-9]+{letter_}({letter_}|{digit})* { 
+    fprintf(output_file, "Error type A at Line %d: unknown lexeme %s\n", yylineno, yytext); 
+    error_happen = 1; 
+    yylval = create_node("ERR"); 
+    return ID; 
+}
 
 "//" {
     char c = yyinput();
@@ -71,6 +112,11 @@ return          { yylval = create_node("RETURN", 0); return RETURN; }
 "\n" { yycolno = 1; }
 [ \r\t] {}
 
-. { fprintf(output_file, "Error type A at Line %d: unknown lexeme %s\n", yylineno, yytext); error_happen = 1; }
+. { 
+    fprintf(output_file, "Error type A at Line %d: unknown lexeme %s\n", yylineno, yytext); 
+    error_happen = 1; 
+    yylval = create_node("ERR"); 
+    return CHAR; 
+}
 
 %%
