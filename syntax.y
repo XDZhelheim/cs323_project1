@@ -52,8 +52,8 @@ ExtDef:
     | Specifier FunDec CompSt               { $$ = create_child_node("ExtDef", @$.first_line, {$1, $2, $3}); }
     | Specifier ExtDecList error            { fprintf(output_file, "Error type B at Line %d: Missing semicolon ';'\n", @$.first_line); error_happen = 1; }
     | Specifier error                       { fprintf(output_file, "Error type B at Line %d: Missing semicolon ';'\n", @$.first_line); error_happen = 1; }
-    | error ExtDecList SEMI                 { fprintf(output_file, "error ExtDecList SEMI Error type B at Line %d: Missing specifier\n", @$.first_line); error_happen = 1; }
-    | error SEMI                            { fprintf(output_file, "error SEMI Error type B at Line %d: Missing specifier\n", @$.first_line); error_happen = 1; }
+    | error ExtDecList SEMI                 { fprintf(output_file, "Error type B at Line %d: Missing specifier\n", @$.first_line); error_happen = 1; }
+    | error SEMI                            { fprintf(output_file, "Error type B at Line %d: Missing specifier\n", @$.first_line); error_happen = 1; }
     ;
 ExtDecList: 
       VarDec                                { $$ = create_child_node("ExtDecList", @$.first_line, {$1}); }
