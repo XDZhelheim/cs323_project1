@@ -37,7 +37,9 @@ struct TreeNode
     vector<TreeNode *> child;
 };
 
-TreeNode *create_node(string name, int position, DataType type=DataType::OTHER, string val = "")
+struct TreeNode *root;
+
+TreeNode *create_node(string name, int position, DataType type = DataType::OTHER, string val = "")
 {
     TreeNode *node = new TreeNode;
     node->name = name;
@@ -81,7 +83,7 @@ public:
 
     void recursive_print(TreeNode *node, int depth)
     {
-        if (node->type == DataType::CHILD && node->child.size() == 0) 
+        if (node->type == DataType::CHILD && node->child.size() == 0)
         {
             return;
         }
@@ -124,7 +126,7 @@ public:
     }
 };
 
-void PrintTreeNode(TreeNode *root, char *file_path)
+void PrintTreeNode(char *file_path)
 {
     string path = file_path;
     string out_path = "/dev/stdout";
@@ -132,7 +134,30 @@ void PrintTreeNode(TreeNode *root, char *file_path)
     {
         out_path = path.substr(0, path.length() - 4) + ".out";
     }
-    Printer(root, out_path).print();
+    if (error_happen)
+    {
+        fflush(tmp_file);
+        fseek(tmp_file, 0, SEEK_SET);
+
+        const size_t buffer_size = 1023;
+        char buffer[buffer_size + 1];
+
+        size_t size = buffer_size;
+        FILE *out = fopen(out_path.c_str(), "w+");
+        while (size == buffer_size)
+        {
+            size = fread(buffer, 1, buffer_size, tmp_file);
+
+            fwrite(buffer, 1, size, out);
+        }
+        fflush(out);
+
+        fclose(tmp_file);
+    }
+    else
+    {
+        Printer(root, out_path).print();
+    }
 }
 
 #endif
