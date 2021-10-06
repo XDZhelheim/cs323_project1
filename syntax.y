@@ -1,5 +1,6 @@
 %{
     #include "lex.yy.c"
+    #include <string.h>
     #define YYSTYPE TreeNode *
     extern "C" {
         #include "TreeNode.hpp"
@@ -149,6 +150,9 @@ void yyerror(const char *s) {
 }
 
 int main(int argc, char **argv){
+    tmp_file = tmpfile();
+    error_happen = 0;
+
     char *file_path;
     if(argc < 2){
         fprintf(stderr, "Usage: %s <file_path>\n", argv[0]);
@@ -160,7 +164,34 @@ int main(int argc, char **argv){
             return EXIT_FAIL;
         }
         yyparse();
-        PrintTreeNode(root, file_path);
+        char* out_path;
+        char* ext;
+        strncpy(ext, &file_path[strlen(file_path) - 4], 4);
+        if (strcmp(ext, ".spl") == 0)
+        {
+            strncpy(out_path, file_path, strlen(file_path) - 4);
+            strcat(out_path, ".out");
+        }
+        if (error_happen) {
+            fflush(tmp_file);
+            fseek(tmp_file, 0, SEEK_SET);
+
+            const size_t buffer_size = 1023;
+            char buffer[buffer_size + 1];
+
+            size_t size = buffer_size;
+            while (size == buffer_size)
+            {
+                size = fread(buffer, 1, buffer_size, tmp_file);
+
+                fwrite(buffer, 1, size, out_path);
+            }
+            fflush(out_path);
+
+            fclose(tmp_file);
+        } else {
+            PrintTreeNode(root, file_path);
+        }
         return 0;
     } else{
         fputs("Too many arguments! Expected: 2.\n", stderr);

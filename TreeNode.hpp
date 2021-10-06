@@ -5,6 +5,10 @@
 #include <initializer_list>
 #include <string>
 #include <fstream>
+#include <unistd.h>
+
+FILE *tmp_file;
+int error_happen;
 
 using std::endl;
 using std::initializer_list;
