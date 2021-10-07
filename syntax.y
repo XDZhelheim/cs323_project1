@@ -50,10 +50,10 @@ ExtDef:
       Specifier ExtDecList SEMI             { $$ = create_child_node("ExtDef", @$.first_line, {$1, $2, $3}); }
     | Specifier SEMI                        { $$ = create_child_node("ExtDef", @$.first_line, {$1, $2}); }
     | Specifier FunDec CompSt               { $$ = create_child_node("ExtDef", @$.first_line, {$1, $2, $3}); }
-    | Specifier ExtDecList error            { fprintf(output_file, "Error type B at Line %d: Missing semicolon ';'\n", @$.first_line); error_happen = 1; }
-    | Specifier error                       { fprintf(output_file, "Error type B at Line %d: Missing semicolon ';'\n", @$.first_line); error_happen = 1; }
-    | error ExtDecList SEMI                 { fprintf(output_file, "Error type B at Line %d: Missing specifier\n", @$.first_line); error_happen = 1; }
-    | error SEMI                            { fprintf(output_file, "Error type B at Line %d: Missing specifier\n", @$.first_line); error_happen = 1; }
+    | Specifier ExtDecList error            { fprintf(output_file, "Error type B at Line %d: Missing semicolon ';'\n", @$.first_line); has_error = 1; }
+    | Specifier error                       { fprintf(output_file, "Error type B at Line %d: Missing semicolon ';'\n", @$.first_line); has_error = 1; }
+    | error ExtDecList SEMI                 { fprintf(output_file, "Error type B at Line %d: Missing specifier\n", @$.first_line); has_error = 1; }
+    | error SEMI                            { fprintf(output_file, "Error type B at Line %d: Missing specifier\n", @$.first_line); has_error = 1; }
     ;
 ExtDecList: 
       VarDec                                { $$ = create_child_node("ExtDecList", @$.first_line, {$1}); }
@@ -76,8 +76,8 @@ VarDec:
 FunDec: 
       ID LP VarList RP                      { $$ = create_child_node("FunDec", @$.first_line, {$1, $2, $3, $4}); }
     | ID LP RP                              { $$ = create_child_node("FunDec", @$.first_line, {$1, $2, $3}); }
-    | ID LP VarList error                   { fprintf(output_file, "Error type B at Line %d: Missing closing parenthesis ')'\n", @$.first_line); error_happen = 1; }
-    | ID LP error                           { fprintf(output_file, "Error type B at Line %d: Missing closing parenthesis ')'\n", @$.first_line); error_happen = 1; }
+    | ID LP VarList error                   { fprintf(output_file, "Error type B at Line %d: Missing closing parenthesis ')'\n", @$.first_line); has_error = 1; }
+    | ID LP error                           { fprintf(output_file, "Error type B at Line %d: Missing closing parenthesis ')'\n", @$.first_line); has_error = 1; }
     ;
 VarList: 
       ParamDec COMMA VarList                { $$ = create_child_node("VarList", @$.first_line, {$1, $2, $3}); }
@@ -101,8 +101,8 @@ Stmt:
     | IF LP Exp RP Stmt                     { $$ = create_child_node("Stmt", @$.first_line, {$1, $2, $3, $4, $5}); }
     | IF LP Exp RP Stmt ELSE Stmt           { $$ = create_child_node("Stmt", @$.first_line, {$1, $2, $3, $4, $5, $6, $7}); }
     | WHILE LP Exp RP Stmt                  { $$ = create_child_node("Stmt", @$.first_line, {$1, $2, $3, $4, $5}); }
-    | Exp error                             { fprintf(output_file, "Error type B at Line %d: Missing semicolon ';'\n", @$.first_line); error_happen = 1; }
-    | RETURN Exp error                      { fprintf(output_file, "Error type B at Line %d: Missing semicolon ';'\n", @$.first_line); error_happen = 1; }
+    | Exp error                             { fprintf(output_file, "Error type B at Line %d: Missing semicolon ';'\n", @$.first_line); has_error = 1; }
+    | RETURN Exp error                      { fprintf(output_file, "Error type B at Line %d: Missing semicolon ';'\n", @$.first_line); has_error = 1; }
     ;
 DefList: 
       Def DefList                           { $$ = create_child_node("DefList", @$.first_line, {$1, $2}); }
@@ -110,8 +110,8 @@ DefList:
     ;
 Def: 
       Specifier DecList SEMI                { $$ = create_child_node("Def", @$.first_line, {$1, $2, $3}); }
-    | Specifier DecList error               { fprintf(output_file, "Error type B at Line %d: Missing semicolon ';'\n", @$.first_line); error_happen = 1; }
-    | error DecList SEMI                    { fprintf(output_file, "Error type B at Line %d: Missing specifier\n", @$.first_line); error_happen = 1; }
+    | Specifier DecList error               { fprintf(output_file, "Error type B at Line %d: Missing semicolon ';'\n", @$.first_line); has_error = 1; }
+    | error DecList SEMI                    { fprintf(output_file, "Error type B at Line %d: Missing specifier\n", @$.first_line); has_error = 1; }
     ;
 DecList: 
       Dec                                   { $$ = create_child_node("DecList", @$.first_line, {$1}); }
@@ -147,9 +147,9 @@ Exp:
     | INT                                   { $$ = create_child_node("Exp", @$.first_line, {$1}); }
     | FLOAT                                 { $$ = create_child_node("Exp", @$.first_line, {$1}); }
     | CHAR                                  { $$ = create_child_node("Exp", @$.first_line, {$1}); }
-    | LP Exp error                          { fprintf(output_file, "Error type B at Line %d: Missing closing parenthesis ')'\n", @$.first_line); error_happen = 1; }
-    | ID LP Args error                      { fprintf(output_file, "Error type B at Line %d: Missing closing parenthesis ')'\n", @$.first_line); error_happen = 1; }
-    | ID LP error                           { fprintf(output_file, "Error type B at Line %d: Missing closing parenthesis ')'\n", @$.first_line); error_happen = 1; }
+    | LP Exp error                          { fprintf(output_file, "Error type B at Line %d: Missing closing parenthesis ')'\n", @$.first_line); has_error = 1; }
+    | ID LP Args error                      { fprintf(output_file, "Error type B at Line %d: Missing closing parenthesis ')'\n", @$.first_line); has_error = 1; }
+    | ID LP error                           { fprintf(output_file, "Error type B at Line %d: Missing closing parenthesis ')'\n", @$.first_line); has_error = 1; }
     ;
 Args: 
       Exp COMMA Args                        { $$ = create_child_node("Args", @$.first_line, {$1, $2, $3}); }
@@ -160,7 +160,7 @@ Args:
 void yyerror(const char *s) {}
 
 int main(int argc, char **argv){
-    error_happen = 0;
+    has_error = 0;
 
     char *file_path;
     if(argc < 2){
@@ -183,8 +183,8 @@ int main(int argc, char **argv){
             output_file = fopen(out, "w+");
         }
         yyparse();
-        // printf("error happen = %d\n", error_happen);
-        if (error_happen) {
+        // printf("error happen = %d\n", has_error);
+        if (has_error) {
             fflush(output_file);
             fclose(output_file);
             // PrintTreeNode("./temp.spl");

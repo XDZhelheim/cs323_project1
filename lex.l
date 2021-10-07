@@ -63,41 +63,41 @@ return          { yylval = create_node("RETURN", 0); return RETURN; }
 
 "&" { 
     fprintf(output_file, "Error type A at Line %d: unknown lexeme %s\n", yylineno, yytext); 
-    error_happen = 1; 
+    has_error = 1; 
     yylval = create_node("ERR"); 
     return AND; 
 }
 "|" { 
     fprintf(output_file, "Error type A at Line %d: unknown lexeme %s\n", yylineno, yytext); 
-    error_happen = 1; 
+    has_error = 1; 
     yylval = create_node("ERR"); 
     return OR; 
 }
 
 0x{hexdigit}*[g-zG-Z]{hexdigit}* { 
     fprintf(output_file, "Error type A at Line %d: unknown lexeme %s\n", yylineno, yytext); 
-    error_happen = 1; 
+    has_error = 1; 
     yylval = create_node("ERR"); 
     return INT; 
 }
 
 \'\\x{hexdigit}*[g-zG-Z]{hexdigit}*\' { 
     fprintf(output_file, "Error type A at Line %d: unknown lexeme %s\n", yylineno, yytext); 
-    error_happen = 1; 
+    has_error = 1; 
     yylval = create_node("ERR"); 
     return CHAR; 
 }
 
 \'\\x{hexdigit}{3,}\' { 
     fprintf(output_file, "Error type A at Line %d: unknown lexeme %s\n", yylineno, yytext); 
-    error_happen = 1; 
+    has_error = 1; 
     yylval = create_node("ERR"); 
     return CHAR; 
 }
 
 [0-9]+{letter_}({letter_}|{digit})* { 
     fprintf(output_file, "Error type A at Line %d: unknown lexeme %s\n", yylineno, yytext); 
-    error_happen = 1; 
+    has_error = 1; 
     yylval = create_node("ERR"); 
     return ID; 
 }
@@ -109,12 +109,33 @@ return          { yylval = create_node("RETURN", 0); return RETURN; }
     }
 }
 
+"/*" {
+    char c = 0;
+    char buffer;
+    while (buffer = yyinput()) {
+        if (c == '*' && buffer == '/') {
+            yycolno += 2;
+            break;
+        }
+        if (c == '\n') {
+            yycolno = 1; // yylineno will still auto-increase
+        } else {
+            yycolno++;
+        }
+        c = buffer;
+    }
+    if (buffer == 0) {
+        fprintf(output_file, "Error type A at Line %d: Missing \"*/\"\n", yylineno);
+        has_error = 1;
+    }
+}
+
 "\n" { yycolno = 1; }
 [ \r\t] {}
 
 . { 
     fprintf(output_file, "Error type A at Line %d: unknown lexeme %s\n", yylineno, yytext); 
-    error_happen = 1; 
+    has_error = 1; 
     yylval = create_node("ERR"); 
     return CHAR; 
 }

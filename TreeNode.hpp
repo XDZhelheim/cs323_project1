@@ -8,7 +8,7 @@
 #include <unistd.h>
 
 FILE *output_file;
-int error_happen;
+int has_error;
 
 using std::endl;
 using std::initializer_list;

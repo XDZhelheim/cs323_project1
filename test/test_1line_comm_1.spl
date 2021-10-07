@@ -1,0 +1,5 @@
+int test_1line_comm_1() {
+    int a // comment 1
+    // comment 2
+    int b = 2
+}

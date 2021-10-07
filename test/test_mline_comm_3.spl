@@ -1,0 +1,5 @@
+int test_mline_comm_3() {
+    int a = 1;
+    /* 
+    comment 1
+}
