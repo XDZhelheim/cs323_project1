@@ -1,3 +1,5 @@
+make splc
+
 cd test/
 
 for i in $(ls *.spl); do

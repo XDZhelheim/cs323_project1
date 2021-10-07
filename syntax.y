@@ -183,11 +183,9 @@ int main(int argc, char **argv){
             output_file = fopen(out, "w+");
         }
         yyparse();
-        // printf("error happen = %d\n", has_error);
         if (has_error) {
             fflush(output_file);
             fclose(output_file);
-            // PrintTreeNode("./temp.spl");
         }
         else
         {
