@@ -1,0 +1,9 @@
+int test_correct_1(int a)
+{
+  int b = 'd';
+  a = 'c';
+  while (a < b) 
+  {
+    a = a + 1;
+  }
+}

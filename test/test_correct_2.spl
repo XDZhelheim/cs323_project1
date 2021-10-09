@@ -1,0 +1,8 @@
+int test_correct_2()
+{
+  int a = 100, b = 40;
+  while (a != 0) {
+    a = a - a / b * b; 
+  }
+  return b;
+}

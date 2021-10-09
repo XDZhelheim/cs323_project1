@@ -1,0 +1,11 @@
+struct struct_correct_3 
+{
+  int x;
+  char y;
+};
+
+int test_correct_3()
+{
+  struct struct_correct_3 object;
+  object.x = object.y = 1;
+}
