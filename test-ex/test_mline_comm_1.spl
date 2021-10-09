@@ -1,0 +1,7 @@
+int test_mline_comm_1() {
+    int a /* comment 1 */
+    /*
+    com
+        ment 2 */
+    int b = 2
+}

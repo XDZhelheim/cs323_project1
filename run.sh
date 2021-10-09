@@ -1,6 +1,6 @@
 make splc
 
-cd test/
+cd test-self/
 
 for i in $(ls *.spl); do
     ../bin/splc $i

@@ -1,0 +1,8 @@
+int test_1line_comm_2(float a, char b) { // comment 1
+    if (a >= 2.0) {
+        // comment 2
+    }
+    else {
+        char c = b; // comment 3
+    }
+}

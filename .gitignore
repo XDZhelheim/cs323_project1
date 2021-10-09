@@ -64,6 +64,6 @@ lex.yy.c
 .vscode/
 
 # test result
-/test/*.out
+/test-self/*.out
 
 temp*
