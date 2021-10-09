@@ -29,11 +29,11 @@ hexdigit [0-9a-fA-F]
 \'([\x20-\x7E]|\\x{hexdigit}{1,2})\'    { yylval = create_node("CHAR", 0, DataType::CHAR_TYPE, yytext); return CHAR; }
 
 int|float|char  { yylval = create_node("TYPE", 0, DataType::TYPE_TYPE, yytext); return TYPE; }
-struct          { yylval = create_node("STRUCT", 0); return STRUCT; }
-if              { yylval = create_node("IF", 0); return IF; }
-else            { yylval = create_node("ELSE", 0); return ELSE; }
-while           { yylval = create_node("WHILE", 0); return WHILE; }
-return          { yylval = create_node("RETURN", 0); return RETURN; }
+struct          { yylval = create_node("STRUCT"); return STRUCT; }
+if              { yylval = create_node("IF"); return IF; }
+else            { yylval = create_node("ELSE"); return ELSE; }
+while           { yylval = create_node("WHILE"); return WHILE; }
+return          { yylval = create_node("RETURN"); return RETURN; }
 
 {letter_}({letter_}|{digit})*           { yylval = create_node("ID", 0, DataType::ID_TYPE, yytext); return ID; }
 
