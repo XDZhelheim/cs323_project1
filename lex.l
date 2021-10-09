@@ -74,14 +74,14 @@ return          { yylval = create_node("RETURN"); return RETURN; }
     return OR; 
 }
 
-0x{hexdigit}*[g-zG-Z]{hexdigit}* { 
+0x{hexdigit}*[g-zG-Z]+{hexdigit}* { 
     fprintf(output_file, "Error type A at Line %d: unknown lexeme %s\n", yylineno, yytext); 
     has_error = 1; 
     yylval = create_node("ERR"); 
     return INT; 
 }
 
-\'\\x{hexdigit}*[g-zG-Z]{hexdigit}*\' { 
+\'\\x{hexdigit}*[g-zG-Z]+{hexdigit}*\' { 
     fprintf(output_file, "Error type A at Line %d: unknown lexeme %s\n", yylineno, yytext); 
     has_error = 1; 
     yylval = create_node("ERR"); 
@@ -103,10 +103,7 @@ return          { yylval = create_node("RETURN"); return RETURN; }
 }
 
 "//" {
-    char c = yyinput();
-    while(c != '\n') {
-        c = yyinput();
-    }
+    while(yyinput() != '\n');
 }
 
 "/*" {
@@ -125,7 +122,7 @@ return          { yylval = create_node("RETURN"); return RETURN; }
         c = buffer;
     }
     if (buffer == 0) {
-        fprintf(output_file, "Error type A at Line %d: Missing \"*/\"\n", yylineno);
+        fprintf(output_file, "Error type B at Line %d: Missing closing symbol \"*/\"\n", yylineno);
         has_error = 1;
     }
 }

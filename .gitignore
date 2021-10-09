@@ -65,3 +65,5 @@ lex.yy.c
 
 # test result
 /test/*.out
+
+temp*

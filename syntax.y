@@ -8,14 +8,6 @@
     void yyerror(const char*);
 %}
 
-%initial-action
-{
-  @$.first_line = 1;
-  @$.first_column = 1;
-  @$.last_line = 1;
-  @$.last_column = 1;
-};
-
 %token INT FLOAT CHAR ID
 %token TYPE
 %token STRUCT
@@ -38,6 +30,9 @@
 %right NOT
 %left LC RC LB RB DOT
 
+%nonassoc LOWER_ELSE
+%nonassoc ELSE
+
 %%
 Program: 
       ExtDefList                            { $$ = create_child_node("Program", @$.first_line, {$1}); root = $$; }
@@ -58,6 +53,7 @@ ExtDef:
 ExtDecList: 
       VarDec                                { $$ = create_child_node("ExtDecList", @$.first_line, {$1}); }
     | VarDec COMMA ExtDecList               { $$ = create_child_node("ExtDecList", @$.first_line, {$1, $2, $3}); }
+    | VarDec ExtDecList error               { fprintf(output_file, "Error type B at Line %d: Missing comma ','\n", @$.first_line); has_error = 1; }
     ;
 
 Specifier: 
@@ -67,11 +63,13 @@ Specifier:
 StructSpecifier: 
       STRUCT ID LC DefList RC               { $$ = create_child_node("StructSpecifier", @$.first_line, {$1, $2, $3, $4, $5}); }
     | STRUCT ID                             { $$ = create_child_node("StructSpecifier", @$.first_line, {$1, $2}); }
+    | STRUCT ID LC DefList error            { fprintf(output_file, "Error type B at Line %d: Missing closing parenthesis '}'\n", @$.first_line); has_error = 1; }
     ;
 
 VarDec:
       ID                                    { $$ = create_child_node("VarDec", @$.first_line, {$1}); }
     | VarDec LB INT RB                      { $$ = create_child_node("VarDec", @$.first_line, {$1, $2, $3, $4}); }
+    | VarDec LB INT error                   { fprintf(output_file, "Error type B at Line %d: Missing closing parenthesis ']'\n", @$.first_line); has_error = 1; }
     ;
 FunDec: 
       ID LP VarList RP                      { $$ = create_child_node("FunDec", @$.first_line, {$1, $2, $3, $4}); }
@@ -81,10 +79,12 @@ FunDec:
     ;
 VarList: 
       ParamDec COMMA VarList                { $$ = create_child_node("VarList", @$.first_line, {$1, $2, $3}); }
+    | ParamDec VarList error                { fprintf(output_file, "Error type B at Line %d: Missing comma ','\n", @$.first_line); has_error = 1; }
     | ParamDec                              { $$ = create_child_node("VarList", @$.first_line, {$1}); }
     ;
 ParamDec: 
       Specifier VarDec                      { $$ = create_child_node("ParamDec", @$.first_line, {$1, $2}); }
+    | error VarDec                          { fprintf(output_file, "Error type B at Line %d: Missing specifier\n", @$.first_line); has_error = 1; }
     ;
 
 CompSt: 
@@ -98,11 +98,14 @@ Stmt:
       Exp SEMI                              { $$ = create_child_node("Stmt", @$.first_line, {$1, $2}); }
     | CompSt                                { $$ = create_child_node("Stmt", @$.first_line, {$1}); }
     | RETURN Exp SEMI                       { $$ = create_child_node("Stmt", @$.first_line, {$1, $2, $3}); }
-    | IF LP Exp RP Stmt                     { $$ = create_child_node("Stmt", @$.first_line, {$1, $2, $3, $4, $5}); }
+    | IF LP Exp RP Stmt %prec LOWER_ELSE    { $$ = create_child_node("Stmt", @$.first_line, {$1, $2, $3, $4, $5}); }
     | IF LP Exp RP Stmt ELSE Stmt           { $$ = create_child_node("Stmt", @$.first_line, {$1, $2, $3, $4, $5, $6, $7}); }
     | WHILE LP Exp RP Stmt                  { $$ = create_child_node("Stmt", @$.first_line, {$1, $2, $3, $4, $5}); }
     | Exp error                             { fprintf(output_file, "Error type B at Line %d: Missing semicolon ';'\n", @$.first_line); has_error = 1; }
     | RETURN Exp error                      { fprintf(output_file, "Error type B at Line %d: Missing semicolon ';'\n", @$.first_line); has_error = 1; }
+    | IF LP Exp error Stmt %prec LOWER_ELSE { fprintf(output_file, "Error type B at Line %d: Missing closing parenthesis ')'\n", @$.first_line); has_error = 1; }
+    | IF LP Exp error Stmt ELSE Stmt        { fprintf(output_file, "Error type B at Line %d: Missing closing parenthesis ')'\n", @$.first_line); has_error = 1; }
+    | WHILE LP Exp error Stmt               { fprintf(output_file, "Error type B at Line %d: Missing closing parenthesis ')'\n", @$.first_line); has_error = 1; }
     ;
 DefList: 
       Def DefList                           { $$ = create_child_node("DefList", @$.first_line, {$1, $2}); }
@@ -116,6 +119,7 @@ Def:
 DecList: 
       Dec                                   { $$ = create_child_node("DecList", @$.first_line, {$1}); }
     | Dec COMMA DecList                     { $$ = create_child_node("DecList", @$.first_line, {$1, $2, $3}); }
+    | Dec DecList error                     { fprintf(output_file, "Error type B at Line %d: Missing comma ','\n", @$.first_line); has_error = 1; }
     ;
 Dec: 
       VarDec                                { $$ = create_child_node("Dec", @$.first_line, {$1}); }
@@ -150,6 +154,7 @@ Exp:
     | LP Exp error                          { fprintf(output_file, "Error type B at Line %d: Missing closing parenthesis ')'\n", @$.first_line); has_error = 1; }
     | ID LP Args error                      { fprintf(output_file, "Error type B at Line %d: Missing closing parenthesis ')'\n", @$.first_line); has_error = 1; }
     | ID LP error                           { fprintf(output_file, "Error type B at Line %d: Missing closing parenthesis ')'\n", @$.first_line); has_error = 1; }
+    | Exp LB Exp error                      { fprintf(output_file, "Error type B at Line %d: Missing closing parenthesis ']'\n", @$.first_line); has_error = 1; }
     ;
 Args: 
       Exp COMMA Args                        { $$ = create_child_node("Args", @$.first_line, {$1, $2, $3}); }
