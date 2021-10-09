@@ -44,11 +44,75 @@ Referring to `token.txt`, write rules to return these tokens. And for `int, floa
 
 #### 2.2.2 Error Detection
 
+Set a global variable `has_error` to control the main function to print parse tree or error messages.
+
 There are three types of error:
 
+* Undefined tokens
 * Illegal hex int
+* Illegal hex char
 
-  Write regular expression
+Write regular expressions to capture them. What is essential is that when error detected, we should still create a leaf node for parser and return a token. Only by this, the parser can continue analyzing. If not, there will be a missing token, which will lead to totally wrong shift/reduce steps after it.
+
+For line number, use `%option yylineno`, as introduced in project document.
+
+#### 2.2.3 Single and Multiline Comment
+
+* Single line
+
+  Read characters until meet `\n`, very simple.
+
+  `"//" { while(yyinput() != '\n'); }`
+
+* Multiline
+
+  Since we should detect `*/`, which are two characters, use a buffer character to look ahead. If `*/` is not detected, return error.
+
+  ```c
+  "/*" {
+      char c = 0;
+      char buffer;
+      while (buffer = yyinput()) {
+          if (c == '*' && buffer == '/') {
+              yycolno += 2;
+              break;
+          }
+          if (c == '\n') {
+              yycolno = 1; // yylineno will still auto-increase
+          } else {
+              yycolno++;
+          }
+          c = buffer;
+      }
+      if (buffer == 0) {
+          fprintf(output_file, "Error type A at Line %d: Missing \"*/\"\n", yylineno);
+          has_error = 1;
+      }
+  }
+  ```
 
 ### 2.3 Parser
 
+#### 2.3.1 Syntax Analysis
+
+Referring to `syntax.txt`, write corresponding productions, and replace `$` by `%empty`.
+
+Create a internal node for the pass tree. The children are the right side of the production.
+
+#### 2.3.2 Error Detection
+
+There are three types of error:
+
+* Missing semicolon or comma
+* Missing specifier
+* Missing closing symbol
+
+For each type of error, place `error` in every possible positions, and print error message.
+
+For line number, use `@$` or `@1, @2, ...` (a struct) to get line or column numbers.
+
+#### 2.3.3 Main Function
+
+
+
+## 3 Conclusion
