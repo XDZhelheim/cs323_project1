@@ -15,7 +15,7 @@ This project is to implement a parser that accepts a single command line argumen
   * Lexical error (error type A) when there are undefined characters or tokens in the SPL
     program, or identifiers starting with digits.
   * Syntax error (error type B) when the program has an illegal structure, such as missing
-    closing symbol. Please nd as many syntax errors as possible.
+    closing symbol.
 * Print line number of the error code
 * Support hexadecimal representation of integers
 * Support hex-form characters
@@ -150,3 +150,5 @@ For line number, use `@$` or `@1, @2, ...` (a struct) to get line or column numb
 We define a `Printer` class to print the result. With some special case like `int, float, char, ID, TYPE` , we need to specify its type like `TYPE: ` and `data` of `TreeNode`, in other cases, for symbols only `name` is needed or for parent node `name` adding line number is needed, with indent of 2 spaces.
 
 ## 3 Conclusion
+
+In this project, we implemented a simple lexer and parser which can print parse tree or error message. The difficulty we met is that how to print out the structure of parse tree. Therefore, we designed a tree data structure to store the tokens it parsed, and create internal nodes to represent a production. At last, print the parse tree by tree traversal. For error detection, we considered all error possibilities and used bison's error recovery function. When writing this, we met many shift/reduce conflicts, and tried to resolve them. However, there are sill a few that remained unsolved, which should be improved in the future.
