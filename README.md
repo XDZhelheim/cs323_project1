@@ -24,17 +24,51 @@ For bonus part, we implemented single and multiline comment.
 
 ### 1.2 Development Environment
 
-* `Ubuntu 20.04.2 LTS x86_64` with `Linux 5.8.0-50-generic`
-* `g++ (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0`
+* `Ubuntu 18.04.6 LTS x86_64` with `Linux 5.4.0-87-generic`
+* `gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0`
+* `g++ (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0`
 * `flex 2.6.4`
-* `bison (GNU Bison) 3.5.1`
-* `GNU Make 4.2.1`
+* `bison (GNU Bison) 3.0.4`
+* `GNU Make 4.1`
 
 ## 2 Design and Implementation
 
 ### 2.1 Tree Construction
 
+In `lex.l` and `syntax.y` , we call function `create_node` and `create_child_node` in `TreeNode.hpp` to generate `TreeNode` which is a part of tree struct .
 
+```cpp
+struct TreeNode
+{
+    string name; // name of the node
+    DataType type; // type of this node
+    int pos; // line number of this node
+    TreeNode *parent; // parent node
+    string data; // store int|float|char value as string to avoid overflow, also name of TYPE or ID
+    vector<TreeNode *> child; // if this is a parent node, it will have child nodes
+};
+```
+
+In `lex.l` , the generated node is returned by modifying `yylval` .
+
+In `syntax.y` , the generated node is returned by modifying `$$` .
+
+We make every token recognized a `TreeNode` . `create_node` function makes node with `int, float, char` value or an ID of variable or just a symbol like `+` , `;` and etc . `create_child_node` function makes node which has a sub-struct within this node as a code block `if-else` statement contains `IF, (, ), {, Exp, }, ELSE, {, Exp, }` . 
+
+```cpp
+enum DataType
+{
+    INT_TYPE, // for int
+    FLOAT_TYPE, // for float
+    CHAR_TYPE, // for char
+    ID_TYPE, // for name of variable
+    TYPE_TYPE, // for specifier
+    CHILD, // for parent node
+    OTHER // for symbols
+};
+```
+
+We also define a `DataType` enum to specify the type of node to avoid defining multiple node. 
 
 ### 2.2 Lexer
 
@@ -113,6 +147,6 @@ For line number, use `@$` or `@1, @2, ...` (a struct) to get line or column numb
 
 #### 2.3.3 Main Function
 
-
+We define a `Printer` class to print the result. With some special case like `int, float, char, ID, TYPE` , we need to specify its type like `TYPE: ` and `data` of `TreeNode`, in other cases, for symbols only `name` is needed or for parent node `name` adding line number is needed, with indent of 2 spaces.
 
 ## 3 Conclusion
