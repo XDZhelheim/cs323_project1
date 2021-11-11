@@ -13,3 +13,6 @@ for i in $(ls *.out); do
     diff $i ./ans/$i
     echo "---"
 done
+
+cd ..
+make clean
