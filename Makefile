@@ -1,16 +1,20 @@
+ifeq ($(shell uname), Darwin) # macOS
+	CXXFLAGS=-ll -ly --std=c++11
+else
+	CXXFLAGS=-lfl -ly
+endif
+
 CC=gcc
 CXX=g++
 FLEX=flex
 BISON=bison
-
 
 .lex: lex.l
 	$(FLEX) lex.l
 .syntax: syntax.y
 	$(BISON) -v -t -d syntax.y
 splc: .lex .syntax
-	mkdir -p bin && $(CXX) syntax.tab.c -lfl -ly -o bin/splc
+	mkdir -p bin && $(CXX) syntax.tab.c -o bin/splc $(CXXFLAGS)
 clean:
-	@rm -f lex.yy.c syntax.tab.*
-	@rm -r bin
+	@rm -rf lex.yy.c syntax.tab.* bin syntax.output
 all: splc
